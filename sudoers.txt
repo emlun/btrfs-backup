@@ -1,6 +1,8 @@
 # Allow group wheel to execute btrfs snapshot commands without a password
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs subvolume snapshot -r / /snapshots/*
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs subvolume snapshot -r /home /home/snapshots/*
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs subvolume delete /snapshots/*
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs subvolume delete /home/snapshots/*
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs send /snapshots/*
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs send * /snapshots/*
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs send /home/snapshots/*
