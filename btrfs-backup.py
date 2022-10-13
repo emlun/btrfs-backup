@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-import datetime
 import os
 import socket
 import subprocess
 import sys
 import time
+
+from datetime import datetime
+
 
 KEEP_NUM = 30
 THIS_HOSTNAME = socket.gethostname()
@@ -18,7 +20,10 @@ def await_network():
     print('Checking network connectivity...')
     delay_s = 5
     while True:
-        check_connection = subprocess.run(['ssh', REMOTE_HOST, 'date', '-Is'], timeout=10)
+        check_connection = subprocess.run(
+            ['ssh', REMOTE_HOST, 'date', '-Is'],
+            timeout=10,
+        )
         if check_connection.returncode == 0:
             break
         else:
@@ -28,8 +33,8 @@ def await_network():
     print()
 
 
-def drop_last(l, ndrop):
-    return [i for i in l[0:(len(l) - ndrop)]]
+def drop_last(lst, ndrop):
+    return [i for i in lst[0:(len(lst) - ndrop)]]
 
 
 def exit_unless(proc, desc):
@@ -40,18 +45,22 @@ def exit_unless(proc, desc):
 
 def take_snapshot(volume, snapshots_dir, snapshot_prefix):
     print(f'Taking snapshot of {volume}')
-    snapshot_path = os.path.join(
-        snapshots_dir,
-        snapshot_prefix + datetime.datetime.now().astimezone().strftime('%Y-%m-%dT%H:%M:%S%z')
-    )
+    timestamp = datetime.now().astimezone().strftime('%Y-%m-%dT%H:%M:%S%z')
+    snapshot_path = os.path.join(snapshots_dir, snapshot_prefix + timestamp)
     exit_unless(
-        subprocess.run(['sudo', 'btrfs', 'subvolume', 'snapshot', '-r', volume, snapshot_path]),
-        'btrfs subvolume snapshot'
+        subprocess.run([
+            'sudo', 'btrfs', 'subvolume',
+            'snapshot', '-r', volume, snapshot_path,
+        ]),
+        'btrfs subvolume snapshot',
     )
     print(f'Created snapshot: {snapshot_path}')
 
     print('Removing old snapshots...')
-    local_snaps = sorted(fn for fn in os.listdir(snapshots_dir) if fn.startswith(snapshot_prefix))
+    local_snaps = sorted(
+        fn for fn in os.listdir(snapshots_dir)
+        if fn.startswith(snapshot_prefix)
+    )
     delete_local_subvols([
         os.path.join(snapshots_dir, fn)
         for fn in drop_last(local_snaps, KEEP_NUM)
@@ -65,8 +74,9 @@ def delete_local_subvols(subvol_paths):
         print(d)
 
     exit_unless(
-        subprocess.run(['sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths]),
-        'btrfs subvolume delete'
+        subprocess.run([
+            'sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths]),
+        'btrfs subvolume delete',
     )
 
 
@@ -77,8 +87,11 @@ def delete_remote_subvols(subvol_paths):
         print(d)
 
     exit_unless(
-        subprocess.run(['ssh', REMOTE_HOST, 'sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths]),
-        'ssh btrfs subvolume delete'
+        subprocess.run([
+            'ssh', REMOTE_HOST,
+            'sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths,
+        ]),
+        'ssh btrfs subvolume delete',
     )
 
 
@@ -97,11 +110,20 @@ def send(snapshots_dir, snapshot_prefix):
         print('Incomplete shapshots:')
         for s in remote_incomplete:
             print(s)
-        incomplete_snapshots = [os.path.join(REMOTE_DIR, fn.removesuffix('.incomplete')) for fn in remote_incomplete]
+        incomplete_snapshots = [
+            os.path.join(REMOTE_DIR, fn.removesuffix('.incomplete'))
+            for fn in remote_incomplete
+        ]
         delete_remote_subvols(incomplete_snapshots)
         exit_unless(
-            subprocess.run(['ssh', REMOTE_HOST, 'sudo', 'rm', *[os.path.join(REMOTE_DIR, fn) for fn in remote_incomplete]]),
-            'ssh rm incomplete'
+            subprocess.run([
+                'ssh', REMOTE_HOST,
+                'sudo', 'rm', *[
+                    os.path.join(REMOTE_DIR, fn)
+                    for fn in remote_incomplete
+                ],
+            ]),
+            'ssh rm incomplete',
         )
     else:
         print('No incomplete snapshots.')
@@ -139,7 +161,10 @@ def send(snapshots_dir, snapshot_prefix):
         clone_srcs = [arg for pair in clone_srcs for arg in pair]
 
         exit_unless(
-            subprocess.run(['ssh', REMOTE_HOST, 'sudo', 'touch', f"'{incomplete_filename}'"]),
+            subprocess.run([
+                'ssh', REMOTE_HOST,
+                'sudo', 'touch', f"'{incomplete_filename}'",
+            ]),
             'ssh touch incomplete',
         )
 
@@ -158,7 +183,10 @@ def send(snapshots_dir, snapshot_prefix):
         exit_unless(btrfs_receive, 'ssh btrfs receive')
 
         exit_unless(
-            subprocess.run(['ssh', REMOTE_HOST, 'sudo', 'rm', f"'{incomplete_filename}'"]),
+            subprocess.run([
+                'ssh', REMOTE_HOST,
+                'sudo', 'rm', f"'{incomplete_filename}'",
+            ]),
             'ssh rm incomplete',
         )
 
@@ -171,9 +199,9 @@ def send(snapshots_dir, snapshot_prefix):
     remote_snaps = sorted([
         fn for fn in
         subprocess.run(
-        ['ssh', REMOTE_HOST, 'ls', '-1', REMOTE_DIR],
-        stdout=subprocess.PIPE,
-        encoding='utf-8').stdout.split()
+            ['ssh', REMOTE_HOST, 'ls', '-1', REMOTE_DIR],
+            stdout=subprocess.PIPE,
+            encoding='utf-8').stdout.split()
         if fn.startswith(snapshot_prefix)
     ])
     if len(remote_snaps) > KEEP_NUM:
