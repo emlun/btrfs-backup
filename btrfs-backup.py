@@ -86,41 +86,49 @@ def delete_remote_subvols(subvol_paths):
     for d in subvol_paths:
         print(d)
 
-    exit_unless(
-        subprocess.run([
-            'ssh', REMOTE_HOST,
-            'sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths,
-        ]),
-        'ssh btrfs subvolume delete',
-    )
+    if len(subvol_paths) > 0:
+        exit_unless(
+            subprocess.run([
+                'ssh', REMOTE_HOST,
+                'sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths,
+            ]),
+            'ssh btrfs subvolume delete',
+        )
 
 
 def send(snapshots_dir, snapshot_prefix):
     print()
     print(f'Snapshot directory: {snapshots_dir} prefix: {snapshot_prefix}')
     print()
-    remote_incomplete = [
-        fn for fn in subprocess.run(
+
+    remote_files = set(
+        fn for fn in
+        subprocess.run(
             ['ssh', REMOTE_HOST, 'ls', '-1', REMOTE_DIR],
             stdout=subprocess.PIPE,
-            encoding='utf-8').stdout.split()
-        if fn.startswith(snapshot_prefix) and fn.endswith('.incomplete')
-    ]
-    if len(remote_incomplete) > 0:
-        print('Incomplete shapshots:')
-        for s in remote_incomplete:
+            encoding='utf-8'
+        ).stdout.split()
+        if fn.startswith(snapshot_prefix)
+    )
+    remote_incomplete_markers = [fn for fn in remote_files
+                                 if fn.endswith('.incomplete')]
+    remote_incomplete_snapshots = sorted(
+        set([fn.removesuffix('.incomplete')
+             for fn in remote_incomplete_markers])
+        .intersection(remote_files)
+    )
+
+    if len(remote_incomplete_markers) > 0:
+        print('Incomplete shapshot markers:')
+        for s in remote_incomplete_markers:
             print(s)
-        incomplete_snapshots = [
-            os.path.join(REMOTE_DIR, fn.removesuffix('.incomplete'))
-            for fn in remote_incomplete
-        ]
-        delete_remote_subvols(incomplete_snapshots)
+        delete_remote_subvols(remote_incomplete_snapshots)
         exit_unless(
             subprocess.run([
                 'ssh', REMOTE_HOST,
                 'sudo', 'rm', *[
                     os.path.join(REMOTE_DIR, fn)
-                    for fn in remote_incomplete
+                    for fn in remote_incomplete_markers
                 ],
             ]),
             'ssh rm incomplete',
