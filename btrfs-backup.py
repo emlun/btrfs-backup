@@ -134,11 +134,8 @@ def send(snapshots_dir, snapshot_prefix):
         encoding='utf-8').stdout.split())
     local_snaps = set(os.listdir(snapshots_dir))
 
-    shared_snaps = local_snaps.intersection(remote_snaps)
-    new_snaps = local_snaps.difference(remote_snaps)
-    new_snaps = sorted(new_snaps)
-
-    shared_snaps = sorted(shared_snaps)
+    shared_snaps = sorted(local_snaps.intersection(remote_snaps))
+    new_snaps = sorted(local_snaps.difference(remote_snaps))
 
     print()
     if len(new_snaps) > 0:
