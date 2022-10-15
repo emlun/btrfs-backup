@@ -34,7 +34,7 @@ def await_network():
 
 
 def drop_last(lst, ndrop):
-    return [i for i in lst[0:(len(lst) - ndrop)]]
+    return [i for i in lst[0:max(0, (len(lst) - ndrop))]]
 
 
 def exit_unless(proc, desc):
