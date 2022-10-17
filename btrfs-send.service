@@ -8,4 +8,4 @@ After=btrfs-snapshot.service
 Type=oneshot
 User=emlun
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/usr/bin/python /home/emlun/dev/btrfs-backup/btrfs-backup.py send
+ExecStart=/usr/bin/python /usr/local/bin/btrfs-backup.py send

@@ -7,4 +7,4 @@ After=local-fs.target
 Type=oneshot
 User=emlun
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/usr/bin/python /home/emlun/dev/btrfs-backup/btrfs-backup.py snapshot
+ExecStart=/usr/bin/python /usr/local/bin/btrfs-backup.py snapshot
