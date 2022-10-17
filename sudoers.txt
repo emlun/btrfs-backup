@@ -1,3 +1,4 @@
+# Client:
 # Allow group wheel to execute btrfs snapshot commands without a password
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs ^subvolume snapshot -r / /snapshots/root-[^/]+$
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs ^subvolume snapshot -r /home /home/snapshots/home-[^/]+$
@@ -5,3 +6,10 @@
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs ^subvolume delete( /home/snapshots/home-[^/]+)+$
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs ^send (-c /snapshots/root-[^/]+ )*/snapshots/root-[^/]+$
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/btrfs ^send (-c /home/snapshots/home-[^/]+ )*/home/snapshots/home-[^/]+$
+
+# Server:
+# Allow user receive-btrfs-snapshots to execute btrfs receive commands without a password
+receive-btrfs-snapshots ALL=(ALL) NOPASSWD: /usr/bin/btrfs ^receive /btrfs-snapshots/(oden|hugin)$
+receive-btrfs-snapshots ALL=(ALL) NOPASSWD: /usr/bin/touch ^/btrfs-snapshots/(oden|hugin)/[^/]+.incomplete$
+receive-btrfs-snapshots ALL=(ALL) NOPASSWD: /usr/bin/rm ^/btrfs-snapshots/(oden|hugin)/[^/]+.incomplete$
+receive-btrfs-snapshots ALL=(ALL) NOPASSWD: /usr/bin/btrfs ^subvolume delete( /btrfs-snapshots/(oden|hugin)/[^/]+)+$
