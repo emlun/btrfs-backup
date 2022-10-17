@@ -1,0 +1,10 @@
+[Unit]
+Description=Run btrfs-backup target
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+Unit=btrfs-backup.target
+
+[Install]
+WantedBy=timers.target

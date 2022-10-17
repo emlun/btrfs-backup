@@ -1,4 +1,5 @@
 [Unit]
+Description=Generate btrfs-backup snapshots
 Requires=local-fs.target
 After=local-fs.target
 

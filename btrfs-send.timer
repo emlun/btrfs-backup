@@ -1,7 +1,0 @@
-[Timer]
-OnCalendar=daily
-Persistent=true
-Unit=btrfs-send.service
-
-[Install]
-WantedBy=multi-user.target

@@ -1,4 +1,5 @@
 [Unit]
+Description=Upload btrfs-backup snapshots to remote server
 Requires=local-fs.target
 After=local-fs.target
 After=btrfs-snapshot.service
