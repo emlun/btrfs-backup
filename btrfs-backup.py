@@ -219,14 +219,19 @@ def send(snapshots_dir, snapshot_prefix):
         print('Nothing to delete!')
 
 
-def main():
-    take_snapshot('/', '/snapshots', 'root-')
-    take_snapshot('/home', '/home/snapshots', 'home-')
+def main(argv):
+    if argv[1] == 'snapshot':
+        take_snapshot('/', '/snapshots', 'root-')
+        take_snapshot('/home', '/home/snapshots', 'home-')
 
-    await_network()
-    send('/snapshots', 'root-')
-    send('/home/snapshots', 'home-')
+    elif argv[1] == 'send':
+        await_network()
+        send('/snapshots', 'root-')
+        send('/home/snapshots', 'home-')
 
+    else:
+        print('Unknown command: ' + argv[1])
+        sys.exit(1)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
