@@ -179,7 +179,7 @@ def send(snapshots_dir, snapshot_prefix):
             stdout=subprocess.PIPE)
         btrfs_receive = subprocess.Popen([
             'ssh', REMOTE_HOST,
-            'sudo', 'btrfs', 'receive', os.path.join(REMOTE_DIR, '')
+            'sudo', 'btrfs', 'receive', REMOTE_DIR,
         ], stdin=btrfs_send.stdout)
 
         btrfs_send.wait()
