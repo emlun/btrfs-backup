@@ -123,7 +123,9 @@ def send(snapshots_dir, snapshot_prefix):
         print('Incomplete shapshot markers:')
         for s in remote_incomplete_markers:
             print(s)
-        delete_remote_subvols(remote_incomplete_snapshots)
+        delete_remote_subvols([
+            os.path.join(REMOTE_DIR, fn)
+            for fn in remote_incomplete_snapshots])
         exit_unless(
             subprocess.run([
                 'ssh', REMOTE_HOST,
