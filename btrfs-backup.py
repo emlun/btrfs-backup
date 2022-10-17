@@ -73,10 +73,10 @@ def delete_local_subvols(subvol_paths):
     for d in subvol_paths:
         print(d)
 
-    for subvol_path in subvol_paths:
+    if len(subvol_paths) > 0:
         exit_unless(
             subprocess.run([
-                'sudo', 'btrfs', 'subvolume', 'delete', subvol_path]),
+                'sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths]),
             'btrfs subvolume delete',
         )
 
@@ -87,11 +87,11 @@ def delete_remote_subvols(subvol_paths):
     for d in subvol_paths:
         print(d)
 
-    for subvol_path in subvol_paths:
+    if len(subvol_paths) > 0:
         exit_unless(
             subprocess.run([
                 'ssh', REMOTE_HOST,
-                'sudo', 'btrfs', 'subvolume', 'delete', subvol_path,
+                'sudo', 'btrfs', 'subvolume', 'delete', *subvol_paths,
             ]),
             'ssh btrfs subvolume delete',
         )
