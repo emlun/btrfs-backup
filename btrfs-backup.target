@@ -2,3 +2,4 @@
 Description=Run btrfs-backup snapshot generation and upload
 Requires=btrfs-snapshot.service
 Requires=btrfs-send.service
+BindsTo=btrfs-send.service
