@@ -1,7 +1,7 @@
 # Maintainer: Emil Lundberg <emil@emlun.se> (emlun)
 
 pkgname='btrfs-backup'
-pkgver='0.5.0'
+pkgver='0.6.0'
 pkgrel=1
 pkgdesc="emlun's BTRFS backup system"
 license=('custom:unlicense')
@@ -25,7 +25,7 @@ source=(
 sha1sums=('ff007ce11f3ff7964f1a5b04202c4e95b5c82c85'
           '923bb88866551b2a6ef8e117504e882f9ca902f1'
           '36561704fa5090643fcc0d47ca1509456e68e01f'
-          'a274bfd66f6d340fa1481113c3b1162c55379acb'
+          '82e4fd8c7efc6d26cdf39ac167159a7822a11fad'
           '0830f5d0a5c976446cce85c3301699ed969d2c7a'
           'fa21764e0dd39867a50fdc1d4b34f21534d23c11'
           'c8f662899c1dbc54a5df8ac281040131838a6fca')
