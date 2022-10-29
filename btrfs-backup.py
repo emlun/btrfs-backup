@@ -193,11 +193,11 @@ def send(snapshots_dir, snapshot_prefix):
             'sudo', 'btrfs', 'receive', REMOTE_DIR,
         ], stdin=btrfs_send.stdout)
 
-        btrfs_send.wait()
         btrfs_receive.wait()
-
-        exit_unless(btrfs_send, 'btrfs send')
         exit_unless(btrfs_receive, 'ssh btrfs receive')
+
+        btrfs_send.wait()
+        exit_unless(btrfs_send, 'btrfs send')
 
         exit_unless(
             subprocess.run([
