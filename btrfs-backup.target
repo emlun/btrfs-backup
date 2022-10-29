@@ -3,3 +3,7 @@ Description=Run btrfs-backup snapshot generation and upload
 Requires=btrfs-snapshot.service
 BindsTo=btrfs-send.service
 After=btrfs-send.service
+After=sleep.target
+
+[Install]
+WantedBy=sleep.target

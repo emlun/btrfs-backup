@@ -44,17 +44,26 @@ def exit_unless(proc, desc):
 
 
 def take_snapshot(volume, snapshots_dir, snapshot_prefix):
-    print(f'Taking snapshot of {volume}')
     timestamp = datetime.now().astimezone().strftime('%Y-%m-%dT%H:%M:%S%z')
-    snapshot_path = os.path.join(snapshots_dir, snapshot_prefix + timestamp)
-    exit_unless(
-        subprocess.run([
-            'sudo', 'btrfs', 'subvolume',
-            'snapshot', '-r', volume, snapshot_path,
-        ]),
-        'btrfs subvolume snapshot',
+    daystamp = timestamp[0:10]
+    local_snaps = sorted(
+        fn for fn in os.listdir(snapshots_dir)
+        if fn.startswith(snapshot_prefix)
     )
-    print(f'Created snapshot: {snapshot_path}')
+    if any([daystamp in fn for fn in local_snaps]):
+        print(f'Snapshot of {daystamp} already exists; skipping.')
+
+    else:
+        print(f'Taking snapshot of {volume}')
+        snapshot_path = os.path.join(snapshots_dir, snapshot_prefix + timestamp)
+        exit_unless(
+            subprocess.run([
+                'sudo', 'btrfs', 'subvolume',
+                'snapshot', '-r', volume, snapshot_path,
+            ]),
+            'btrfs subvolume snapshot',
+        )
+        print(f'Created snapshot: {snapshot_path}')
 
     print('Removing old snapshots...')
     local_snaps = sorted(
